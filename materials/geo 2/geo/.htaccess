@@ -1,0 +1,12 @@
+RewriteEngine on
+RewriteBase /
+
+RewriteCond %{HTTP_HOST} ^www.knott.fun$ [NC]
+RewriteRule ^(.*)$ https://knott.fun/$1 [R=301,L]
+
+RewriteRule ^/?$ /index.html [L,QSA]
+
+RewriteRule ^page_name/?$ /page_name.html [L,QSA]
+
+
+ErrorDocument 404 /404.html

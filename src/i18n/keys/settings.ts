@@ -1,0 +1,16 @@
+export default {
+	"__ns": "settings",
+	"language_select": "language_select",
+	"model_lerning": "model_lerning",
+	"new_user": "new_user",
+	"post_address": "post_address",
+	"enter_post_address": "enter_post_address",
+	"password": "password",
+	"enter_password": "enter_password",
+	"permissions": "permissions",
+	"permissions_level_select": "permissions_level_select",
+	"add_user": "add_user",
+	"delete_users": "delete_users",
+	"select_users": "select_users",
+	"start_entering_name": "start_entering_name",
+}

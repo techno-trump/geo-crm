@@ -1,0 +1,15 @@
+{
+	"edit_box_attributes": "Редактировать атрибуты ящика",
+	"edit_interval": "Редактировать интервал",
+	"edit_markup": "Редактировать разметку",
+	"edit_reference_by_depth": "Редактировать привязку по глубине",
+	"add_box": "Добавить ящик",
+	"remove_box": "Удалить ящик",
+	"box_attributes": "Атрибуты ящика",
+	"box_attributes_editing": "Редактирование атрибутов ящика",
+	"interval_from": "Интервал от",
+	"interval_to": "Интервал до",
+	"interval": "Интервал",
+	"box": "Ящик",
+	"histogram": "Гистограмма"
+}

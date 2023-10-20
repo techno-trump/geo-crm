@@ -1,0 +1,14 @@
+{
+	"borehole": "Скважина",
+	"new_borehole_creation": "Создание новой скважины",
+	"add_borehole": "Добавить скважину",
+	"new_borehole_form_title": "Добавление скважины",
+	"name": "Название",
+	"enter_borehole_name": "Введите название скважины",
+	"depth": "Глубина",
+	"enter_depth": "Введите глубину скважины",
+	"project_id": "ID проекта",
+	"edit_borehole_attributes": "Редактировать атрибуты скважины",
+	"borehole_attributes_editing": "Атрибуты скважины",
+	"geologocal_column": "Геологическая колонка"
+}

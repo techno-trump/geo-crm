@@ -1,0 +1,6 @@
+Дизайн:
+	https://www.figma.com/file/MAId7DmUZ5Ml21Q6gl2jES/GEO?type=design&node-id=909-662&mode=design&t=VJED6VX4eT4uOCnW-0
+API:
+	http://158.160.70.162:3000/docs#/gloryholes/add_borehole
+Верстка:
+	https://geo.agolikov.com/pages.html

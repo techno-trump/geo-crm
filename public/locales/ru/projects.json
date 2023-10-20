@@ -1,0 +1,17 @@
+{
+	"basic_info": "Основная информаци",
+	"name": "Название",
+	"enter_name": "Введите название",
+	"project_type": "Тип проекта",
+	"select_type": "Выберите тип",
+	"new_project_creation": "Создание нового проекта",
+	"new_project": "Новый проект",
+	"load_project": "Загрузить проект",
+	"create": "Создать",
+	"create_and_add_borehole": "Создать и добавить скважину",
+	"core": "Керн",
+	"sludge": "Шлам",
+	"outcrops": "Геологические обнажения",
+	"latest_projects": "Последние проекты",
+	"other": "Другой"
+}

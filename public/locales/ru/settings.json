@@ -1,0 +1,15 @@
+{
+	"language_select": "Выбор языка",
+	"model_lerning": "Дообучение модели",
+	"new_user": "Новый пользователь",
+	"post_address": "Почтовый адрес",
+	"enter_post_address": "Введите почтовый адрес",
+	"password": "Пароль",
+	"enter_password": "Введите пароль",
+	"permissions": "Права доступа",
+	"add_user": "Добавить пользователя",
+	"permissions_level_select": "Выбор уровня доступа",
+	"delete_users": "Удалить пользователей",
+	"select_users": "Выберите пользователей",
+	"start_entering_name": "Начните вводить имя"
+}
