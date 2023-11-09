@@ -44,11 +44,22 @@ export const boxesApi = createApi({
 				query: (id) => `/boxes/${id}`,
 				providesTags: (_, error, id) => error ? [] : [{ type: "Box", id }],
 			}),
+			recalculate: builder.mutation<string, Array<number>> ({
+				query: (ids) =>({
+						url:`/boxes/calculation`,
+						method: 'POST',
+						body: {
+							box_ids: ids
+						}
+					}),
+				invalidatesTags: (_, error, ids) => error ? [] : ids.map(id => ({ type: "Box", id })),
+			}),
 	}),
 })
 export const {
 	useGetByIdQuery,
 	useGetByBoreholeQuery,
 	useUpdateMutation,
-	useDeleteMutation
+	useDeleteMutation,
+	useRecalculateMutation
 	} = boxesApi;

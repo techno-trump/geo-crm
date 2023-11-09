@@ -16,6 +16,7 @@ export type TActionMeta = IActionProps;
 export type TAction = typeof Action;
 export const renderActions = (meta: TActionsMeta) => meta.map((metaItem, idx) => {
 		const{ tooltip, caption, Icon } = metaItem;
+		if (typeof metaItem.show == "boolean" && !metaItem.show) return null;
 		return "actions" in metaItem ?
 			<ActionsGroup key={idx} actions={metaItem.actions} Icon={Icon} /> :
 			<Action
@@ -28,16 +29,18 @@ export const renderActions = (meta: TActionsMeta) => meta.map((metaItem, idx) =>
 	});
 export const prepareActionsMeta = <T extends TActionsContext>(meta: TRawActionsMeta<T>, ctx: T): TActionsMeta => {
 	return meta.map(metaItem => {
-		const { caption, tooltip } = metaItem;
+		const { caption, tooltip, show } = metaItem;
 		if ("actions" in metaItem) {
 			return {
 				...metaItem,
+				show: show ? show(ctx) : undefined,
 				caption: caption && ctx.tMeta(caption),
 				tooltip: tooltip && ctx.tMeta(tooltip),
 				actions: prepareActionsMeta(metaItem.actions, ctx) as Array<TActionMeta> };
 		} else {
 			return {
 				...metaItem,
+				show: show ? show(ctx) : undefined,
 				caption: caption && ctx.tMeta(caption),
 				tooltip: tooltip && ctx.tMeta(tooltip),
 				onClick: metaItem.onClickFactory(ctx)

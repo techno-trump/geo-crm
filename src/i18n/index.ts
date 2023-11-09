@@ -30,12 +30,14 @@ i18n
 		//ns: ['shared', 'settings', 'roles', 'projects', 'boreholes'],
     fallbackLng: getSelectedLang() || "ru",
 		saveMissing: true,
-    interpolation: {
-      escapeValue: false, // not needed for react as it escapes by default
-    },
 		react: {
 			useSuspense: true,
-	 	}
+	 	},
+		backend: {
+      backendOptions: [{
+        loadPath: '/locales/{{lng}}/{{ns}}.json'
+      }]
+    }
   });
 
 export default i18n;

@@ -26,12 +26,14 @@ export type TActionMeta = {
 	Icon?: TIcon;
 	caption?: string;
 	tooltip?: string;
+	show?: boolean;
 	onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 };
 export type TRawActionMeta<Context> = {
 	Icon?: TIcon;
 	caption?: TTranslationKey;
 	tooltip?: TTranslationKey;
+	show?: (ctx: Context) => boolean;
 	onClickFactory: (ctx: Context) =>
 		(event: React.MouseEvent<HTMLButtonElement>) => void;
 };
@@ -39,12 +41,14 @@ export type TActionsGroupMeta = {
 	Icon?: TIcon;
 	caption?: string;
 	tooltip?: string;
+	show?: boolean;
 	actions: Array<TActionMeta>;
 };
 export type TRawActionsGroupMeta<Context> = {
 	Icon?: TIcon;
 	caption?: TTranslationKey;
 	tooltip?: TTranslationKey;
+	show?: (ctx: Context) => boolean;
 	actions: Array<TRawActionMeta<Context>>;
 };
 export type TRawActionsMeta<Context> = Array<TRawActionMeta<Context> | TRawActionsGroupMeta<Context>>;

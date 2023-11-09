@@ -23,6 +23,8 @@ import GeologicalColumnPage from './pages/GeologicalColumn';
 import HistogramPage from './pages/Histogram';
 import ManualPage from "./pages/Manual";
 import MarkupPage from "./pages/Markup";
+import ProjectsPage from "./pages/Projects";
+import BoxDeepnesMarkup from './pages/BoxDeepnesMarkup';
 
 const router = createBrowserRouter([
   {
@@ -41,6 +43,10 @@ const router = createBrowserRouter([
 				path: "manual",
 				element: <ManualPage />,
 			},
+			{
+        path: "projects",
+        element: <ProjectsPage />,
+      },
 			{
         path: "projects/new",
         element: <NewPoject />,
@@ -84,6 +90,16 @@ const router = createBrowserRouter([
 			{
 				path: "boxes/:boxId/histogram",
 				element: <HistogramPage />,
+				children: [
+					{
+						path: "edit",
+       			element: <BoxForm />,
+					}
+				]
+			},
+			{
+				path: "boxes/:boxId/deepnes-markup",
+				element: <BoxDeepnesMarkup />,
 				children: [
 					{
 						path: "edit",

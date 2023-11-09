@@ -17,12 +17,13 @@ export const projectsApi = createApi({
 					}),
 				invalidatesTags: ["Project"],
 			}),
-			// get: builder.query<Array<TProjectSchema>, void> ({
-			// 	query: () => `/projects`,
-			// 	providesTags: (result) => result && !("detail" in result) && [{ type: "Project", id: result.id }] || [],
-			// }),
+			get: builder.query<Array<TProjectSchema>, { skip?: number; limit?: number; } | void> ({
+				query: ({ skip, limit } = {}) => `/projects?skip=${skip || 0}&limit=${limit || 100}`,
+				providesTags: (result) => result && !("detail" in result) && result.map(record => ({ type: "Project", id: record.id })) || [],
+			}),
 	}),
 })
 export const {
-	useCreateMutation
+	useCreateMutation,
+	useGetQuery
 	} = projectsApi;

@@ -12,5 +12,6 @@ export default {
 	"interval_to": "interval_to",
 	"interval": "interval",
 	"box": "box",
-	"histogram": "histogram"
+	"histogram": "histogram",
+	"edit_deepnes_markup": "edit_deepnes_markup"
 }

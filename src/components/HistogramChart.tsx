@@ -23,7 +23,7 @@ export const options: ChartOptions<"bar"> = {
 			reverse: true,
 		},
 		y: {
-			reverse: true,
+			reverse: false,
 		}
 	},
   elements: {

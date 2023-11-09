@@ -182,7 +182,11 @@ const rawActionsMeta: TRawActionsMeta<TReportActionsContext> = [
 			},
 			{
 				caption: { ns: boxes.__ns, key: boxes.edit_markup },
-				onClickFactory: ({ navigate }) => () => { navigate(`markup`) },
+				onClickFactory: ({ navigate, data }) => () => { navigate(`/boxes/${(data as TBoxSchema).borehole_id}/markup`) },
+			},
+			{
+				caption: { ns: boxes.__ns, key: boxes.edit_deepnes_markup },
+				onClickFactory: ({ navigate, data }) => () => { navigate(`/boxes/${(data as TBoxSchema).id}/deepnes-markup`) },
 			}
 		]
 	}
@@ -231,11 +235,13 @@ const Histogram = ({ boxData }: IHistogramProps) => {
 					</>
 				}
 			</div>
-			<div className="histogram_table">
-				<ActionsPanel className="histogram_buttons buttons __flex" meta={prepareActionsMeta(rawActionsMeta, { navigate, data: boxData, tMeta })} />
-				<Table cellData={activeCellData} />
+			<div className="histogram_group">
+				<div className="histogram_table">
+					<ActionsPanel className="histogram_buttons buttons __flex" meta={prepareActionsMeta(rawActionsMeta, { navigate, data: boxData, tMeta })} />
+					<Table cellData={activeCellData} />
+				</div>
+				<FilterSelector activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 			</div>
-			<FilterSelector activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
 		</div>
 	);
 }

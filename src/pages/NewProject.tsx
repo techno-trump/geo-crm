@@ -7,18 +7,17 @@ import { To, useLocation, useNavigate } from "react-router-dom";
 import { projectTypes } from "../constants";
 import { TProjectOption, TProjectRawData, TProjectType } from "../types/projects";
 import { useCreateMutation } from "../services/projects";
-import { DownloadIcon } from "../components/icons";
 import PageHeader from "../components/PageHeader";
 import { prepareActionsMeta } from "../components/Action";
 import { TRawActionMeta, TNewActionsContext } from "../types/actions";
 import { useMetaTranslate } from "../hooks";
 
 const rawActionsMeta: Array<TRawActionMeta<TNewActionsContext>> = [
-	{
-		caption: { ns: projects.__ns, key: projects.load_project },
-		Icon: DownloadIcon,
-		onClickFactory: (_) => () => {},
-	}
+	// {
+	// 	caption: { ns: projects.__ns, key: projects.load_project },
+	// 	Icon: DownloadIcon,
+	// 	onClickFactory: (_) => () => {},
+	// }
 ];
 
 export type TNewProjectFormInputs = {
@@ -53,10 +52,12 @@ const NewProject = () => {
 				if (!valid) return;
 				createProject(getValues() as TProjectRawData).unwrap()
 					.then((data) => {
+						// To do перевод, react component вместо alert
 						alert("Проект был успешно создан");
 						navigate(nextTo, { state: { projectId: data.id } });
 					})
 					.catch(reason => {
+						// To do перевод, react component вместо alert
 						alert("Ошибка при создании проекта: " + reason.message);
 					});
 			})

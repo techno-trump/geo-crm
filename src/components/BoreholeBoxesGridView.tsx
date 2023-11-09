@@ -5,7 +5,7 @@ import { EditIcon, LayersIcon, RefreshIcon, RemoveIcon, ZoomInIcon } from "./ico
 import { useMetaTranslate } from "../hooks";
 import clsx from "clsx";
 import { TBoxSchema } from "../types/boxes";
-import { useDeleteMutation, useGetByBoreholeQuery } from '../services/boxes';
+import { useDeleteMutation, useGetByBoreholeQuery, useRecalculateMutation } from '../services/boxes';
 import { Link, useNavigate } from 'react-router-dom';
 import LoadingContainer from './LoadingContainer';
 import { toFixed } from '../utils';
@@ -18,11 +18,15 @@ import {
 import boxes from '../i18n/keys/boxes';
 import ActionsPanel from './ActionsPanel';
 
-const rawActionsMeta: TRawActionsMeta<TListActionsContext> = [
+const rawActionsMeta: TRawActionsMeta<TListActionsContext & { recalculate: Function }> = [
 	{
 		caption: { ns: shared.__ns, key: shared.classify },
 		Icon: RefreshIcon,
-		onClickFactory: (_) => () => {},
+		onClickFactory: ({ selected, recalculate }) => () => {
+				recalculate(selected.map(record => record.id)).unwrap()
+					.then(() => alert("Классификация успешно инициализирована"))
+					.catch((reason: object) => alert(`Ошибка при запуске классификации:\n${JSON.stringify(reason)}`));
+			},
 	},
 	{
 		tooltip: { ns: shared.__ns, key: shared.remove },
@@ -80,14 +84,15 @@ const MainTableRow = ({ boxData, number, selected = false, toggleSelector }:IMai
 					<div className="box_img">
 						<LoadableImage { ...boxData.image } />
 						<div className="box_buttons">
-							<ActionsGroup Icon={EditIcon} actions={[
+							{boxData.status == "success" && <ActionsGroup Icon={EditIcon} actions={[
 								{ caption: tBoxes(boxes.edit_interval), onClick: () => navigate(`box/${boxData.id}/edit`) },
-								{ caption: tBoxes(boxes.edit_markup), onClick: () => navigate(`/boxes/${boxData.id}/markup`) }
-							]} ></ActionsGroup>
+								{ caption: tBoxes(boxes.edit_markup), onClick: () => navigate(`/boxes/${boxData.id}/markup`) },
+								{ caption: tBoxes(boxes.edit_deepnes_markup), onClick: () => navigate(`/boxes/${boxData.id}/deepnes-markup`) }
+							]} ></ActionsGroup>}
 							<Link className="__btn _icon" to={`/boxes/${boxData.id}`}>
 								<ZoomInIcon />
 							</Link>
-						</div>          
+						</div>
 					</div>
 				</td>
 				<td>{boxData.interval_from}-{boxData.interval_to}</td>
@@ -127,6 +132,7 @@ const BoreholeBoxesGridView = ({ boreholeId }: IBoreholeBoxesGridViewprops) => {
 	const navigate = useNavigate();
 	const tMeta = useMetaTranslate();
 	const [deleteRecords] = useDeleteMutation();
+	const [recalculate] = useRecalculateMutation();
 	const { data: boxesData, isFetching, isError, isSuccess } = useGetByBoreholeQuery(boreholeId);
 	const [selected, setSelected] = useState<Array<boolean>>(Array.from({ length: boxesData?.length || 0 }));
 	const allSelected = Boolean(selected.length) && selected.every(value => value);
@@ -134,6 +140,7 @@ const BoreholeBoxesGridView = ({ boreholeId }: IBoreholeBoxesGridViewprops) => {
 		navigate,
 		selected: boxesData && boxesData.filter((_, idx) => selected[idx]) || [],
 		deleteRecords,
+		recalculate,
 		tMeta
 	});
 

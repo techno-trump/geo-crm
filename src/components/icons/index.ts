@@ -17,3 +17,7 @@ export { default as PolylineIcon } from "./PolylineIcon.tsx";
 export { default as UndoIcon } from "./UndoIcon.tsx";
 export { default as SaveIcon } from "./SaveIcon.tsx";
 export { default as EraserIcon } from "./EraserIcon.tsx";
+export { default as MagnifierIcon } from "./MagnifierIcon.tsx";
+export { default as PolygonIcon } from "./PolygonIcon.tsx";
+export { default as EllipseIcon } from "./EllipseIcon.tsx";
+

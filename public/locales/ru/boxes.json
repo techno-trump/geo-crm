@@ -11,5 +11,6 @@
 	"interval_to": "Интервал до",
 	"interval": "Интервал",
 	"box": "Ящик",
-	"histogram": "Гистограмма"
+	"histogram": "Гистограмма",
+	"edit_deepnes_markup": "Редактировать привязку по глубине"
 }

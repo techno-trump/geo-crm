@@ -6,8 +6,7 @@ export type TProjectTypeMap = { [key: string]: TProjectType; };
 export const projectType: TProjectTypeMap = {
 	CORE: "core",
 	SLUDGE: "sludge",
-	OUTCROPS: "outcrops",
-	OTHER: "other"
+	OUTCROPS: "outcrops"
 }
 type TProjectTypesData = {
 	alias: TProjectType;
@@ -18,7 +17,6 @@ export const projectTypes: Array<TProjectTypesData> = [
 	{ alias: "core", nameLangKey: "core", name: "Керн" },
 	{ alias: "sludge", nameLangKey: "sludge", name: "Шлам" },
 	{ alias: "outcrops", nameLangKey: "outcrops", name: "Геологические обнажения" },
-	{ alias: "other", nameLangKey: "other", name: "Другие" }
 ];
 export const userRoles = [
 	{ alias: "admin", nameLangKey: "admin", name: "Администратор" },

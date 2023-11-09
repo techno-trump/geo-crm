@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import shared from "../i18n/keys/shared";
-import { useNavigate, useParams } from "react-router-dom";
-import { Dialog } from "@headlessui/react";
+import { useNavigate, useParams,  } from "react-router-dom";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useGetByIdQuery, useUpdateMutation } from "../services/boxes";
 import boxes from "../i18n/keys/boxes";
 import { isNotEmptyString } from "../utils";
@@ -59,36 +59,40 @@ export const BoxForm = ({ boxId }:IBoxFormProps) => {
 	}
 	
 	return (
-		<Dialog open={true} onClose={onCloseHandler} className={"modal"}>
-			<Dialog.Panel className={"modal__panel"}>
-				<form className="create_form" onSubmit={handleSubmit(onValidSubmit)}>
-					<div>
-						<div className="create_form_title">{tBoxes(boxes.box_attributes_editing)}</div>
-					</div>
-					<div className="create_form_caption">{tBoxes(boxes.interval_from) + "*"}</div>
-					<input type="text"
-						placeholder={tShared(shared.enter_value)}
-						{...register("interval_from", { required: "required" })}
-					/>
-					{"interval_from" in errors && <div className="field-error">{errors.interval_from?.message}</div>}
-					<div className="create_form_caption">{tBoxes(boxes.interval_to) + "*"}</div>
-					<input type="text"
-						placeholder={tShared(shared.enter_value)}
-						{...register("interval_to", { required: "required" })}
-					/>
-					{"interval_to" in errors && <div className="field-error">{errors.interval_to?.message}</div>}
-					<div className="form-bottom mt-30px">
-						<div className="form-bottom__inner">
-							<button type="button" className="__btn" onClick={onCloseHandler}>{tShared(shared.close)}</button>
-							<button type="submit"
-								disabled={isSubmitting || isLoading || status.isLoading}
-								className="__btn _accent">{tShared(shared.save)}
-							</button>
+		<Dialog.Root open={true}>
+			<Dialog.Portal>
+				<Dialog.Overlay className={"modal"} >
+					<Dialog.Content onEscapeKeyDown={onCloseHandler} onPointerDownOutside={onCloseHandler} className={"modal__panel"}>
+					<form className="create_form" onSubmit={handleSubmit(onValidSubmit)}>
+						<div>
+							<div className="create_form_title">{tBoxes(boxes.box_attributes_editing)}</div>
 						</div>
-					</div>
-				</form>
-			</Dialog.Panel>
-		</Dialog>
+						<div className="create_form_caption">{tBoxes(boxes.interval_from) + "*"}</div>
+						<input type="text"
+							placeholder={tShared(shared.enter_value)}
+							{...register("interval_from", { required: "required" })}
+						/>
+						{"interval_from" in errors && <div className="field-error">{errors.interval_from?.message}</div>}
+						<div className="create_form_caption">{tBoxes(boxes.interval_to) + "*"}</div>
+						<input type="text"
+							placeholder={tShared(shared.enter_value)}
+							{...register("interval_to", { required: "required" })}
+						/>
+						{"interval_to" in errors && <div className="field-error">{errors.interval_to?.message}</div>}
+						<div className="form-bottom mt-30px">
+							<div className="form-bottom__inner">
+								<button type="button" className="__btn" onClick={onCloseHandler}>{tShared(shared.close)}</button>
+								<button type="submit"
+									disabled={isSubmitting || isLoading || status.isLoading}
+									className="__btn _accent">{tShared(shared.save)}
+								</button>
+							</div>
+						</div>
+					</form>
+					</Dialog.Content>
+				</Dialog.Overlay>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 }
 

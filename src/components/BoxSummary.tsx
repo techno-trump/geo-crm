@@ -8,7 +8,7 @@ import { EditIcon, HistogramIcon, LayersIcon, RefreshIcon, RemoveIcon } from "./
 import { TRawActionsMeta, TEditActionsContext } from "../types/actions";
 import { useMetaTranslate } from "../hooks";
 import { prepareActionsMeta } from "./Action";
-import { useDeleteMutation } from "../services/boxes";
+import { useDeleteMutation, useRecalculateMutation } from "../services/boxes";
 import ActionsPanel from "./ActionsPanel";
 import { useGetByCellQuery } from "../services/intervals";
 import { toFixed } from "../utils";
@@ -18,39 +18,67 @@ import LoadableImage from "./LoadableImage";
 import { TFileSchema } from "../types/shared-types";
 import { useGetByIdQuery } from "../services/boreholes";
 import LoadingContainer from "./LoadingContainer";
+import { TMaskType } from "./MarkupEditor";
+import clsx from "clsx";
+import { useState } from "react";
 
+
+interface IMaskImageProps {
+	mainImg: TFileSchema;
+	maskType: TMaskType;
+}
+const MaskImage = ({ mainImg, maskType }: IMaskImageProps) => {
+	// To do replace tmp host with main
+	return <img src={`https://agolikov.com/mask?image_id=${mainImg.id}&mask_type=${maskType}`} alt={mainImg.name}/>;
+}
 interface IBoxMasksProps {
 	mainImg: TFileSchema;
 }
 const BoxMasks = ({ mainImg }:IBoxMasksProps) => {
+	const [activeMask, setActiveMask] = useState<TMaskType | null>(null);
+	const { t: tShared } = useTranslation(shared.__ns);
+	const getToggleHandler = (maskType: TMaskType) => {
+		return () => {
+			setActiveMask(current => current === maskType ? null : maskType);
+		}
+	}
 	return (
 		<section className="case_net __flex">
 			<div className="case_images">
 				<div className="case_img">
 					<LoadableImage {...mainImg} />
 				</div>
-				{/* <div className="case_img" style="display: none;">
-					<img src="/images/p1.jpg" alt srcSet="/images/p1.jpg 1x, /images/p1@2x.jpg 2x"/>
+				<div className={clsx("mask_img", activeMask === "veins" && "active")}>
+					<MaskImage mainImg={mainImg} maskType="veins" />
 				</div>
-				<div className="case_img" style="display: none;">
-					<img src="/images/p2.jpg" alt srcSet="/images/p2.jpg 1x, /images/p2@2x.jpg 2x"/>
+				<div className={clsx("mask_img", activeMask === "core" && "active")}>
+					<MaskImage mainImg={mainImg} maskType="core" />
 				</div>
-				<div className="case_img" style="display: none;">
-					<img src="/images/i1.jpg" alt srcSet="/images/i1.jpg 1x, /images/i1@2x.jpg 2x"/>
-				</div> */}
+				<div className={clsx("mask_img", activeMask === "destroyed" && "active")}>
+					<MaskImage mainImg={mainImg} maskType="destroyed" />
+				</div>
+				<div className={clsx("mask_img", activeMask === "cracks" && "active")}>
+					<MaskImage mainImg={mainImg} maskType="cracks" />
+				</div>
+				<div className={clsx("mask_img", activeMask === "litotypes" && "active")}>
+					<MaskImage mainImg={mainImg} maskType="litotypes" />
+				</div>
 			</div>
 			<ul className="case_buttons">
 				<li>
-					<button data-legend="Тектониты">Vn</button>
+					<button onClick={getToggleHandler("veins")} className={clsx(activeMask === "veins" && "active")} data-legend={tShared(shared.vn)}>Vn</button>
 				</li>
 				<li>
-					<button data-legend="Тектониты">SCR</button>
+					<button onClick={getToggleHandler("core")} className={clsx(activeMask === "core" && "active")} data-legend={tShared(shared.scr)}>SCR</button>
 				</li>
 				<li>
-					<button data-legend="Тектониты">Fr</button>
+					<button onClick={getToggleHandler("destroyed")} className={clsx(activeMask === "destroyed" && "active")} data-legend={tShared(shared.broken_core)}>Des</button>
 				</li>
 				<li>
-					<button data-legend="Тектониты">Tect</button>
+					<button onClick={getToggleHandler("cracks")} className={clsx(activeMask === "cracks" && "active")} data-legend={tShared(shared.cracks)}>Fr</button>
+				</li>
+				<li>
+					<button onClick={getToggleHandler("litotypes")} className={clsx(activeMask === "litotypes" && "active")} data-legend={tShared(shared.tect)}>Tect</button>
 				</li>
 			</ul>
 		</section>
@@ -116,11 +144,15 @@ const CellIntevals = ({ boreholeName, boxNumber, cellId, cellNumber }: ICellInte
 interface IBoxSummaryProps {
 	boxData: TBoxSchema;
 }
-const rawActionsMeta: TRawActionsMeta<TEditActionsContext> = [
+const rawActionsMeta: TRawActionsMeta<TEditActionsContext & { recalculate: Function }> = [
 	{
 		caption: { ns: shared.__ns, key: shared.classify },
 		Icon: RefreshIcon,
-		onClickFactory: (_) => () => {},
+		onClickFactory: ({ recalculate, data }) => () => {
+			recalculate([data.id]).unwrap()
+				.then(() => alert("Классификация успешно инициализирована"))
+				.catch((reason: object) => alert(`Ошибка при запуске классификации:\n${JSON.stringify(reason)}`));
+		},
 	},
 	{
 		tooltip: { ns: shared.__ns, key: shared.remove },
@@ -138,6 +170,7 @@ const rawActionsMeta: TRawActionsMeta<TEditActionsContext> = [
 	},
 	{
 		Icon: EditIcon,
+		show: ({ data }) => (data as TBoxSchema).status === "success",
 		actions: [
 			{
 				caption: { ns: boxes.__ns, key: boxes.edit_interval },
@@ -146,6 +179,10 @@ const rawActionsMeta: TRawActionsMeta<TEditActionsContext> = [
 			{
 				caption: { ns: boxes.__ns, key: boxes.edit_markup },
 				onClickFactory: ({ navigate, data }) => () => navigate(`/boxes/${(data as TBoxSchema).id}/markup`),
+			},
+			{
+				caption: { ns: boxes.__ns, key: boxes.edit_deepnes_markup },
+				onClickFactory: ({ navigate, data }) => () => navigate(`/boxes/${(data as TBoxSchema).id}/deepnes-markup`),
 			}
 		]
 	},
@@ -160,6 +197,7 @@ const BoxSummary = ({ boxData }: IBoxSummaryProps) => {
 	const navigate = useNavigate();
 	const tMeta = useMetaTranslate();
 	const [deleteRecords] = useDeleteMutation();
+	const [recalculate] = useRecalculateMutation();
 	const cellsQueryResult = useGetByBoxQuery(boxData.id);
 	const boreholeQueryResult = useGetByIdQuery(boxData.borehole_id);
 
@@ -167,7 +205,8 @@ const BoxSummary = ({ boxData }: IBoxSummaryProps) => {
 		data: boxData,
 		navigate,
 		tMeta,
-		deleteRecords
+		deleteRecords,
+		recalculate
 	}
 
 	const actionsMeta = prepareActionsMeta(rawActionsMeta, actionsContext);

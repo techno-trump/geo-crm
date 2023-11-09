@@ -1,4 +1,4 @@
-export type TProjectType = "core" | "sludge" | "outcrops" | "other";
+export type TProjectType = "core" | "sludge" | "outcrops";
 export type TProjectOption = { value: TProjectType; label: string; };
 export type TProjectSchema = {
 	name: string;

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { projectType } from '../constants';
 import LastProjects from "../components/LastProjects";
 import projects from '../i18n/keys/projects';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 const Home = () => {
 	const { t: tProjects } = useTranslation(projects.__ns);
+	const navigate = useNavigate();
 	
 	return (
 		<>
@@ -42,8 +43,8 @@ const Home = () => {
 				</ul>
 				<hr/>
 				<div className="new_load">
-					<label>
-						<input className="__input_hidden" type="file"/>
+					<label onClick={() => navigate("/projects/new")}>
+						<input className="__input_hidden" disabled type="file"/>
 						<span>
 							<picture>
 								<source srcSet="/images/svg/load.svg" type="image/webp"/>

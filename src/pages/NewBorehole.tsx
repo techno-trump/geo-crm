@@ -202,7 +202,7 @@ const NewBorehole = () => {
 							/>
 							{"name" in errors && <div className="field-error">{errors.name?.message}</div>}
 							<div className="create_form_caption">{tBoreholes(boreholes.depth)}</div>
-							<input type="text"
+							<input type="number"
 								{ ...register("depth", { required: "required" }) }
 								placeholder={tBoreholes(boreholes.enter_depth)}/>
 							{"depth" in errors && <div className="field-error">{errors.depth?.message}</div>}

@@ -41,7 +41,13 @@ export const userApi = createApi({
 						body: formData
 					})
 			}),
-			register: builder.mutation<TUserSchema | TUnathorizedResponse, TUserRawData> ({
+			logout: builder.mutation<string, void> ({
+				query: () =>({
+						url:`/auth/jwt/logout`,
+						method: 'POST'
+					})
+			}),
+			register: builder.mutation<TUserSchema, TUserRawData> ({
 				query: (requestBody) =>({
 						url:`/auth/register`,
 						method: 'POST',
@@ -71,5 +77,6 @@ export const {
 	useGetAllUsersQuery,
 	useDeleteMutation,
 	useLoginMutation,
+	useLogoutMutation,
 	useLazyGetCurrentUserQuery,
 	useRegisterMutation } = userApi;

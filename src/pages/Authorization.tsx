@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLoginMutation } from "../services/user";
+import { useLoginMutation, useRegisterMutation } from "../services/user";
 import clsx from "clsx";
 import { setSessionToken } from "../services/shared";
 import { Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../stores/hooks";
 import { selectIsAuthorized, setAuthorized } from "../stores/userSlice";
-import { BadCredentialsError, LackOfDataError, responseErrorFactory, TBadResponse } from "../errors";
+import { BadCredentialsError, ValidationError, responseErrorFactory, TBadResponse, isValidationErrorResponse, formatValidationErrors, isUserAlreadyExistResponse } from "../errors";
+import { useTranslation } from "react-i18next";
+import shared from "../i18n/keys/shared";
 
 type AuthFormInputs = {
 	username: string;
@@ -18,6 +20,7 @@ type AuthFormProps = {
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ className }) => {
+	const { t: tShared } = useTranslation(shared.__ns);
 	const [formError, setFormError] = useState<string | null>(null);
 	const formErrorEreaseTimeoutRef = useRef<number | null>(null);
 	const dispatch = useAppDispatch();
@@ -29,7 +32,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ className }) => {
 		setError: setFieldError,
 		formState: { errors }
   } = useForm<AuthFormInputs>({ defaultValues: { username: "", password: "" } });
-		console.log(errors);
+
 	useEffect(() => {
 		if (formError?.length) {
 			if (formErrorEreaseTimeoutRef.current !== null) {
@@ -54,11 +57,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ className }) => {
 			})
 			.catch((reason) => {
 				if (reason instanceof BadCredentialsError) {
-					setFormError(reason.message);
-				} else if (reason instanceof LackOfDataError) {
+					setFormError(tShared(reason.message));
+				} else if (reason instanceof ValidationError) {
 					reason.fieldsErrors.forEach(({ alias, msg }) => setFieldError(alias as keyof AuthFormInputs, { type: "custom", message: msg }));
 				} else if (reason instanceof Error) {
-					alert(reason.message);
+					setFormError(reason.message);
 				}
 			});
 	};
@@ -66,51 +69,100 @@ const AuthForm: React.FC<AuthFormProps> = ({ className }) => {
 	return (
 		<form ref={formRef} className={clsx("sign_form", className)} onSubmit={handleSubmit(onSubmit)}>
 			<div>
-				<p>Электронная почта</p>
-				<input required type="email" placeholder="Введите электронную почту" {...register("username")} />
+				<p>{tShared(shared.email)}</p>
+				<input required type="email" placeholder={tShared(shared.enter_email)} {...register("username")} />
 				{"username" in errors && <div className="field-error">{errors.username?.message}</div>}
 			</div>
 			<div>
-				<p>Пароль</p>
-				<input required type="password" placeholder="Введите пароль"
+				<p>{tShared(shared.password)}</p>
+				<input required type="password" placeholder={tShared(shared.enter_password)}
 					{...register("password")}
 				/>
 				{"password" in errors && <div className="field-error">{errors.password?.message}</div>}
 			</div>
-			<button type="submit" className={clsx("__btn _accent")} disabled={status === "pending"}>Войти</button>
+			<button type="submit" className={clsx("__btn _accent")} disabled={status === "pending"}>{tShared(shared.enter)}</button>
 			{formError && <div>{formError}</div>}
 			<div className="sign_forgout">
-				Забыли пароль?
+			{tShared(shared.forgot_the_password)}
 			</div>
 		</form>
 	)
 }
 const RegForm: React.FC<AuthFormProps> = ({ className }) => {
+	const { t: tShared } = useTranslation(shared.__ns);
+	const [formError, setFormError] = useState<string | null>(null);
+	const formErrorEreaseTimeoutRef = useRef<number | null>(null);
 	const formRef = useRef<HTMLFormElement>(null);
+	const [registerUser] = useRegisterMutation();
 	const {
     register,
     handleSubmit,
-  } = useForm<AuthFormInputs>();
+		setError: setFieldError,
+		formState: { errors }
+  } = useForm<AuthFormInputs>({ defaultValues: { username: "", password: "" } });
 
-  const onSubmit = () => {
+	useEffect(() => {
+		if (formError?.length) {
+			if (formErrorEreaseTimeoutRef.current !== null) {
+				clearTimeout(formErrorEreaseTimeoutRef.current);
+			}
+			formErrorEreaseTimeoutRef.current = setTimeout(() => {
+				setFormError(null);
+			}, 5000);
+		}
+	}, [formError]);
+
+  const onSubmit = ({ username, password }: AuthFormInputs) => {
+		registerUser({
+			email: username,
+			password,
+			is_active: true,
+			is_superuser: true,
+			is_verified: false,
+		}).unwrap()
+			.then((_) => {
+				// To do заменить на react component и добавить перевод
+				alert("Регистрация завершена");
+			})
+			.catch((reason: TBadResponse | Error) => {
+				if (reason instanceof Error) {
+					setFormError(reason.message);
+				} else {
+					if (isValidationErrorResponse(reason)) {
+						formatValidationErrors(reason.data.detail)
+							.fieldsErrors
+							.forEach(({ alias, msg }) => setFieldError(alias as keyof AuthFormInputs, { type: "custom", message: msg }));
+					} else if (isUserAlreadyExistResponse(reason)) {
+						setFormError(tShared(reason.data.detail));
+					}
+				}
+			});
 	};
 
 	return (
 		<form ref={formRef} className={clsx("sign_form", className)} onSubmit={handleSubmit(onSubmit)}>
-			<p>Электронная почта</p>
-			<input required type="username" placeholder="Введите электронную почту"
-				{...register("username")
-			}/>
-			<p>Пароль</p>
-			<input required type="password" placeholder="Введите пароль"
-				{...register("password")}
-			/>
-			<button type="submit" className="__btn _accent">Зарегистрироваться</button>
+			<p>{tShared(shared.email)}</p>
+			<div>
+				<input required type="username" placeholder={tShared(shared.enter_email)}
+					{...register("username")
+				}/>
+				{"username" in errors && <div className="field-error">{errors.username?.message}</div>}
+			</div>
+			<div>
+				<p>{tShared(shared.password)}</p>
+				<input required type="password" placeholder={tShared(shared.enter_password)}
+					{...register("password")}
+				/>
+			</div>
+			<button type="submit" className="__btn _accent">{tShared(shared.register)}</button>
+			{"password" in errors && <div className="field-error">{errors.password?.message}</div>}
+			{formError && <div>{formError}</div>}
 		</form>
 	)
 }
 
 const Authorization = () => {
+	const { t: tShared } = useTranslation(shared.__ns);
 	const isAuthorised = useAppSelector(selectIsAuthorized);
 	const [activeTab, setActiveTab] = useState<"login" | "register">("login");
 	
@@ -127,9 +179,9 @@ const Authorization = () => {
 						</picture>
 					</div>
 					<ul className="sign_bottom __flex">
-						<li>Инновации</li>
-						<li>Геология</li>
-						<li>Творчество</li>
+						<li>{tShared(shared.innovation)}</li>
+						<li>{tShared(shared.geology)}</li>
+						<li>{tShared(shared.creativity)}</li>
 					</ul>
 				</div>
 				<div className="sign_right">
@@ -139,10 +191,10 @@ const Authorization = () => {
 					<div className="sign_block">
 						<ul className="sign_tabs __grid-twoo">
 							<li className={clsx(activeTab === "login" && "active")}>
-								<button onClick={() => setActiveTab("login")}>Войти</button>
+								<button onClick={() => setActiveTab("login")}>{tShared(shared.enter)}</button>
 							</li>
 							<li className={clsx(activeTab === "register" && "active")}>
-								<button onClick={() => setActiveTab("register")}>Регистрация</button>
+								<button onClick={() => setActiveTab("register")}>{tShared(shared.registration)}</button>
 							</li>
 						</ul>
 						<div className="sign_wrapper">

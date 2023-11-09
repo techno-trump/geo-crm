@@ -14,5 +14,6 @@ export default {
 	"sludge": "sludge",
 	"outcrops": "outcrops",
 	"latest_projects": "latest_projects",
-	"other": "other"
+	"other": "other",
+	"all_projects": "all_projects"
 }

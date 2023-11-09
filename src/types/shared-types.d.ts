@@ -9,3 +9,12 @@ export type TFileSchema = {
 	"name": string;
 	"id": number;
 }
+
+export type TMaskSchema = {
+	"mask_type": "string",
+	"image_id": 0,
+	"data": [
+		"string"
+	],
+	"id": 0
+};

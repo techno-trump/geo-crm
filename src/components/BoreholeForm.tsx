@@ -3,7 +3,7 @@ import boreholes from "../i18n/keys/boreholes";
 import { useForm } from "react-hook-form";
 import shared from "../i18n/keys/shared";
 import { useNavigate, useParams } from "react-router-dom";
-import { Dialog } from "@headlessui/react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useUpdateMutation, TBoreholeUpdateAttributes, useGetByIdQuery } from "../services/boreholes";
 import { isNotEmptyString } from "../utils";
 
@@ -49,36 +49,40 @@ const BoreholeForm = ({ boreholeId }:IBoreholeFormProps) => {
 	}
 	
 	return (
-		<Dialog open={true} onClose={onCloseHandler} className={"modal"}>
-			<Dialog.Panel className={"modal__panel"}>
-				<form className="create_form" onSubmit={handleSubmit(onValidSubmit)}>
-					<div>
-						<div className="create_form_title">{tBoreholes(boreholes.borehole_attributes_editing)}</div>
-					</div>
-					<div className="create_form_caption">{tBoreholes(boreholes.name) + "*"}</div>
-					<input type="text"
-						placeholder={tBoreholes(boreholes.enter_borehole_name)}
-						{...register("name", { required: "required" })}
-					/>
-					{"name" in errors && <div className="field-error">{errors.name?.message}</div>}
-					<div className="create_form_caption">{tBoreholes(boreholes.depth) + "*"}</div>
-					<input type="text"
-						placeholder={tBoreholes(boreholes.enter_depth)}
-						{...register("depth", { required: "required" })}
-					/>
-					{"depth" in errors && <div className="field-error">{errors.depth?.message}</div>}
-					<div className="form-bottom mt-30px">
-						<div className="form-bottom__inner">
-							<button type="button" className="__btn" onClick={onCloseHandler}>{tShared(shared.close)}</button>
-							<button type="submit"
-								disabled={isSubmitting || isLoading || status.isLoading}
-								className="__btn _accent">{tShared(shared.save)}
-							</button>
-						</div>
-					</div>
-				</form>
-			</Dialog.Panel>
-		</Dialog>
+		<Dialog.Root open={true}>
+			<Dialog.Portal>
+				<Dialog.Overlay className={"modal"} >
+					<Dialog.Content onEscapeKeyDown={onCloseHandler} onPointerDownOutside={onCloseHandler} className={"modal__panel"}>
+						<form className="create_form" onSubmit={handleSubmit(onValidSubmit)}>
+							<div>
+								<div className="create_form_title">{tBoreholes(boreholes.borehole_attributes_editing)}</div>
+							</div>
+							<div className="create_form_caption">{tBoreholes(boreholes.name) + "*"}</div>
+							<input type="text"
+								placeholder={tBoreholes(boreholes.enter_borehole_name)}
+								{...register("name", { required: "required" })}
+							/>
+							{"name" in errors && <div className="field-error">{errors.name?.message}</div>}
+							<div className="create_form_caption">{tBoreholes(boreholes.depth) + "*"}</div>
+							<input type="number"
+								placeholder={tBoreholes(boreholes.enter_depth)}
+								{...register("depth", { required: "required" })}
+							/>
+							{"depth" in errors && <div className="field-error">{errors.depth?.message}</div>}
+							<div className="form-bottom mt-30px">
+								<div className="form-bottom__inner">
+									<button type="button" className="__btn" onClick={onCloseHandler}>{tShared(shared.close)}</button>
+									<button type="submit"
+										disabled={isSubmitting || isLoading || status.isLoading}
+										className="__btn _accent">{tShared(shared.save)}
+									</button>
+								</div>
+							</div>
+						</form>
+					</Dialog.Content>
+				</Dialog.Overlay>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 }
 

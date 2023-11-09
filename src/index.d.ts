@@ -1,5 +1,5 @@
 type TMode = 'CROPPER' | 'FREE_DRAWING' | 'LINE_DRAWING' | 'TEXT' | 'SHAPE';
-type TShape = 'rect' | 'circle' | 'triangle';
+type TShape = 'rect' | 'circle' | 'triangle' | 'polygon';
 type TShapeDrawingModeOptions = {
 	fill?: string;
 	stroke?: string;
@@ -42,8 +42,9 @@ type TIEInstance = {
 	undo: (iterationCount?: number) => void;
 	clearObjects: () => void;
 	toDataURL: (options?: TToDataURLOptions) => string;
+	destroy: () => void;
 }
-type TImageEditorWrap = {
+type TImageEditorRoot = {
 	getInstance: () => TIEInstance;
 	getRootElement: () => HTMLElement;
 }

@@ -1,23 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom';
 import Disclosure, { DisclosureContext } from '../components/Disclosure';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import projectsKeys from '../i18n/keys/projects';
 import { useTranslation } from 'react-i18next';
 import shared from '../i18n/keys/shared';
 import { useAppSelector } from '../stores/hooks';
 import { selectUserProjects } from '../stores/userSlice';
-import { useLazyGetByProjectQuery } from '../services/boreholes';
-import { TBoreholeSchema } from '../types/boreholes';
+import { useGetByProjectQuery } from '../services/boreholes';
 import { projectTypes } from '../constants';
 import { TProjectSchema, TProjectType } from '../types/projects';
 import clsx from 'clsx';
 import { SmallArrowDownIcon } from './icons';
 import React from 'react';
-
-type TBoreholeData = {
-	name: string;
-	link: string;
-}
+import LoadingContainer from './LoadingContainer';
+import { TBoreholeSchema } from '../types/boreholes';
+import boreholes from '../i18n/keys/boreholes';
 
 interface IHeaderProps {
 	search: string;
@@ -44,45 +41,44 @@ const Header = ({ search, setSearch }: IHeaderProps) => {
 	);
 }
 interface ICategoryListProps {
-	title: string;
 	projects: Array<TProjectSchema>;
-	boreholesMap: TBoreholesMap;
+	className?: string;
 }
-const CategoryList = ({ title, projects, boreholesMap }: ICategoryListProps) => {
-	const { t: tProject } = useTranslation(projectsKeys.__ns);
-	
+export const CategoryList = ({ projects, className }: ICategoryListProps) => {
+
 	return (
-		<div>
-			<div className="last_subtitle">{tProject(title)}</div>
-			<ul className="last_list">
-				{projects.map((projectData) => <li key={projectData.id}>
-						<CategoryList.Item {...projectData} boreholes={boreholesMap[projectData.id]} />
-					</li>
-				)}
-			</ul>
-		</div>
+		<ul className={clsx("last_list", className)}>
+			{projects.map((projectData) =>
+				<li key={projectData.id}>
+					<CategoryList.Item {...projectData} />
+				</li>
+			)}
+		</ul>
 	);
 }
-interface IProjectBoreholeProps extends TBoreholeData {
-	projectId: number;
+interface IProjectBoreholeProps {
+	record: TBoreholeSchema;
 }
-CategoryList.Borehole = ({ name, projectId, link }: IProjectBoreholeProps) => {
+CategoryList.Borehole = ({ record }: IProjectBoreholeProps) => {
 	const { t: tShared } = useTranslation(shared.__ns);
+	const { t: tBoreholes } = useTranslation(boreholes.__ns);
 	return (
 		<li>
-			<p>{name}</p>
-			<Link className="__btn" to={link} state={{ projectId }}>{tShared(shared.open)}</Link>
+			<p>{record.name}; {tBoreholes(boreholes.depth)}: {record.depth} {tShared(shared.unit_meter)}</p>
+			<Link className="__btn"
+				to={`/boreholes/${record.id}`}
+				state={{ projectId: record.project_id }}>{tShared(shared.open)}</Link>
 		</li>
 	)
 }
 interface ICategoryItemProps extends TProjectSchema { 
-	boreholes?: Array<TBoreholeSchema>;
 };
 interface IItemHeaderProps {
 	name: string;
 	projectId: number;
 }
 const ItemHeader = ({ name, projectId }:IItemHeaderProps) => {
+	const { t: tBoreholes } = useTranslation(boreholes.__ns);
 	const { toggle, isOpen } = useContext(DisclosureContext);
 	const navigate = useNavigate();
 
@@ -91,8 +87,8 @@ const ItemHeader = ({ name, projectId }:IItemHeaderProps) => {
 			{/* <Picture {...img} /> */}
 			<span>{name}</span>
 			<div className="last-project-row__actions">
-				<button type="button" className="__btn" onClick={() => navigate("boreholes/new", { state: { projectId } })}>
-					{"Добавить скважину"}
+				<button type="button" className="__btn" onClick={() => navigate("/boreholes/new", { state: { projectId } })}>
+					{tBoreholes(boreholes.add_borehole)}
 				</button>
 				<div className="vertical-separator"></div>
 				<button type="button"
@@ -105,29 +101,55 @@ const ItemHeader = ({ name, projectId }:IItemHeaderProps) => {
 		</Disclosure.Header>
 	);
 }
-CategoryList.Item = ({ name, id, boreholes }: ICategoryItemProps) => {
+CategoryList.Item = ({ name, id }: ICategoryItemProps) => {
+	const { t: tShared } = useTranslation(shared.__ns);
+	const { data, isLoading, isError, error } = useGetByProjectQuery(id);
+
+	const renderBody = () => {
+		if (isLoading) return <LoadingContainer />;
+		if (isError) return <div>${tShared(shared.error)}: ${JSON.stringify(error)}</div>;
+		if (!data) return <div>Something went wrong. No boreholes data to show</div>;
+		return data.map((record) =>
+				<CategoryList.Borehole
+					key={record.id}
+					record={record}
+				/>
+			);
+	};
+
 	return (
 		<Disclosure>
 			<ItemHeader name={name} projectId={id} />
 			<Disclosure.Body>
 				<ul>
-					{boreholes && boreholes.map((data) => <CategoryList.Borehole key={data.id} projectId={id} name={data.name} link={`boreholes/${data.id}`}/>)}
+					{renderBody()}
 				</ul>
 			</Disclosure.Body>
 		</Disclosure>
 	);
 }
+interface ICategoryProps {
+	title: string;
+	projects: Array<TProjectSchema>;
+}
+const Category = ({ title, projects }:ICategoryProps) => {
+	const { t: tProject } = useTranslation(projectsKeys.__ns);
+
+	return (
+		<div>
+			<div className="last_subtitle">{tProject(title)}</div>
+			<CategoryList projects={projects} />
+		</div>
+	);
+} 
 type TGroupedProjects = {
 	[key in TProjectType]: Array<TProjectSchema>;
 };
-type TBoreholesMap = { [key: number]: Array<TBoreholeSchema> };
 
 const LastProjects = () => {
 	const [search, setSearch] = useState<string>("");
-	const [boreholesMap, setBoreholesMap] = useState<TBoreholesMap>({});
 	const normalSearch = useMemo(() => search.toLowerCase(), [search]);
 	const userProjects = useAppSelector(selectUserProjects);
-	const [getProjectBoreholes] = useLazyGetByProjectQuery();
 	const filteredUserProjects = useMemo(() => {
 		return userProjects.filter(projectData => projectData.name.toLowerCase().includes(normalSearch))
 	}, [userProjects, search]);
@@ -139,31 +161,19 @@ const LastProjects = () => {
 		filteredUserProjects.forEach(projectData => {
 			if (projectData.type in groups) {
 				groups[projectData.type].push(projectData);
-			} else {
-				groups.other.push(projectData);
 			}
 		})
 		return groups;
 	}, [filteredUserProjects]);
 
-	useEffect(() => {
-		userProjects.forEach(({ id }) => {
-			getProjectBoreholes(id).unwrap()
-				.then(boreholes => {
-					setBoreholesMap((map) => ({ ...map, [id]: boreholes }))
-				})
-		})
-	}, [userProjects]);
-
 	return (
 		<section className="last">
 			<Header search={search} setSearch={setSearch} />
 			{Object.keys(groupedUserProjects).map((type) =>
-				<CategoryList
+				<Category
 					key={type}
 					title={type}
 					projects={groupedUserProjects[type as TProjectType]}
-					boreholesMap={boreholesMap}
 				/>
 			)}
 		</section>
