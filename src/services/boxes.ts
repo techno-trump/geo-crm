@@ -13,14 +13,14 @@ export const boxesApi = createApi({
 	tagTypes: ["Box"],
 	baseQuery: fetchBaseQuery(baseQueryConfig),
 	endpoints: (builder) => ({
-			// create: builder.mutation<TBoxSchema, TBoreholeRawData> ({
-			// 	query: (requestBody) =>({
-			// 			url:`/boreholes`,
-			// 			method: 'POST',
-			// 			body: requestBody
-			// 		}),
-			// 	invalidatesTags: ["Borehole"],
-			// }),
+			create: builder.mutation<TBoxSchema, TBoxRawData> ({
+				query: (requestBody) =>({
+						url:`/boxes`,
+						method: 'POST',
+						body: requestBody
+					}),
+				invalidatesTags: ["Box"],
+			}),
 			update: builder.mutation<TBoxSchema, TBoxUpdateParams> ({
 				query: ({ id, data }) =>({
 						url:`/boxes?box_id=${id}`,
@@ -57,6 +57,7 @@ export const boxesApi = createApi({
 	}),
 })
 export const {
+	useCreateMutation,
 	useGetByIdQuery,
 	useGetByBoreholeQuery,
 	useUpdateMutation,

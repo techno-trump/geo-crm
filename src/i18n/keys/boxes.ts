@@ -1,5 +1,7 @@
 export default {
 	"__ns": "boxes",
+	"new_box_creation": "new_box_creation",
+	"create_this_and_one_more": "create_this_and_one_more",
 	"edit_box_attributes": "edit_box_attributes",
 	"edit_interval": "edit_interval",
 	"edit_markup": "edit_markup",

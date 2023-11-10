@@ -336,6 +336,18 @@
 			opacity: 1;
 		}
 	}
+	&__tools {
+		display: grid;
+		grid-auto-flow: column;
+		gap: 20px;
+		&::after {
+			content: "";
+			display: inline-block;
+			height: 100%;
+			width: 1px;
+			background-color: var(--primary);
+		}
+	}
 }
 .relative {
 	zoom: normal;
@@ -403,5 +415,11 @@
 	display: flex;
 	& > *:first-child {
 		margin-right: 20px;
+	}
+}
+.file-select {
+	&.disabled .__btn {
+		color: white;
+		background-color: gray;
 	}
 }

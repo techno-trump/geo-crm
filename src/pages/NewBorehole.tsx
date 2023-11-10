@@ -27,8 +27,9 @@ const rawActionsMeta: Array<TRawActionMeta<TNewActionsContext>> = [
 interface IImageSelector {
 	onSelected: (selected: Array<File>) => void;
 	disabled?: boolean;
+	multiple?: boolean;
 }
-const ImageSelector = ({ onSelected, disabled }: IImageSelector) => {
+export const ImageSelector = ({ onSelected, disabled, multiple }: IImageSelector) => {
 	const { t: tShared } = useTranslation(shared.__ns);
 
 	const onChangeHandler: ChangeEventHandler<HTMLInputElement> = useCallback(({ target }) => {
@@ -37,11 +38,11 @@ const ImageSelector = ({ onSelected, disabled }: IImageSelector) => {
 	}, [onSelected]);
 
 	return (
-		<label className={clsx(disabled && "disabled")}>
+		<label className={clsx("file-select", disabled && "disabled")}>
 			<input type="file"
 				disabled={disabled}
 				accept="image/*"
-				multiple
+				multiple={multiple}
 				className="__input_hidden"
 				onChange={onChangeHandler}
 			/>
@@ -98,7 +99,7 @@ interface IAttachmentsPanelProps {
 	loaded: Map<File, TFileSchema>;
 	setLoaded: Dispatch<SetStateAction<Map<File, TFileSchema>>>;
 }
-const AttachmentsPanel = ({ attachments, loaded, setLoaded }: IAttachmentsPanelProps) => {
+export const AttachmentsPanel = ({ attachments, loaded, setLoaded }: IAttachmentsPanelProps) => {
 	const { t: tShared } = useTranslation(shared.__ns);
 
 	const onLoadedHandler = (file: File, fileData: TFileSchema) => {
@@ -207,7 +208,7 @@ const NewBorehole = () => {
 								placeholder={tBoreholes(boreholes.enter_depth)}/>
 							{"depth" in errors && <div className="field-error">{errors.depth?.message}</div>}
 							<div className="create_form_btn">
-								<ImageSelector onSelected={(selected) => setImagesToLoad(current => [...current, ...selected])} />
+								<ImageSelector multiple={true} onSelected={(selected) => setImagesToLoad(current => [...current, ...selected])} />
 								<button
 									type="button"
 									onClick={createAndReturnActionHandler}

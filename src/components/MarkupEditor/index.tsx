@@ -2,7 +2,6 @@ import { TBoxSchema } from "../../types/boxes";
 import { EditIcon, EllipseIcon, EraserIcon, PolygonIcon, PolylineIcon, RectangleIcon, RefreshIcon, SaveIcon, UndoIcon } from "../icons";
 import shared from "../../i18n/keys/shared";
 import { useMetaTranslate } from "../../hooks";
-import Select, { GroupBase, OptionProps, SingleValueProps } from "react-select";
 import { useTranslation } from "react-i18next";
 import { TIcon } from "../icons/index.d";
 import { CSSProperties, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -18,32 +17,6 @@ type TToolOptionRawMeta = {
 	name: TTranslationKey;
 	alias: TToolAlias;
 };
-type TToolOptionMeta = {
-	Icon: TIcon;
-	name: string;
-	alias: TToolAlias;
-};
-
-interface IToolSelectValueProps extends SingleValueProps<TToolOptionMeta, false, GroupBase<TToolOptionMeta>> {
-}
-const ToolSelectValue = ({ innerProps, data: { Icon, name } }: IToolSelectValueProps) => {
-	return (
-		<div {...innerProps} className="sketch-tool-select__value">
-			<Icon />
-			{name}
-		</div>
-	);
-}
-interface IToolSelectOptionProps extends OptionProps<TToolOptionMeta, false, GroupBase<TToolOptionMeta>> {
-}
-const ToolSelectOption = ({ innerProps, data: { Icon, name } }: IToolSelectOptionProps) => {
-	return (
-		<div {...innerProps} className="sketch-tool-select__option">
-			<Icon />
-			{name}
-		</div>
-	);
-}
 const toolsRawMeta: TToolOptionRawMeta[] = [
 	{ alias: "polygon", name: { ns: shared.__ns, key: shared.polygon }, Icon: PolygonIcon },
 	{ alias: "pencil", name: { ns: shared.__ns, key: shared.pencil }, Icon: EditIcon },
@@ -58,26 +31,17 @@ interface IToolSelectProps {
 	setActiveTool: Dispatch<SetStateAction<TToolAlias>>;
 }
 const ToolSelect = ({ activeTool, setActiveTool }: IToolSelectProps) => {
-	const { t: tShared } = useTranslation(shared.__ns);
 	const tMeta = useMetaTranslate();
 	const toolsMeta = toolsRawMeta.map((meta) => ({ ...meta, name: tMeta(meta.name) }));
 	return (
-		<div className="tools">
-			<Select
-				tabIndex={0}
-				className="sketch-tool-select"
-				classNamePrefix="sketch-tool-select"
-				defaultValue={toolsMeta.find(item => item.alias === activeTool)}
-				onChange={(selected) => setActiveTool(selected?.alias || "pencil")}
-				placeholder={tShared(shared.tools)}
-				options={toolsMeta}
-				components={{
-					Option: ToolSelectOption,
-					SingleValue: ToolSelectValue
-				}}
-				//defaultValue={toolsMeta[0]}
-				required
-				/>
+		<div className="markup-editor__tools">
+			{
+				toolsMeta.map(({ alias, name, Icon }) => {
+					return <button type="button" onClick={() => setActiveTool(alias)} className={clsx("__btn _icon ", activeTool === alias && "active")} data-legend={tMeta(name)}>
+										<Icon />
+									</button>;
+				})
+			}
 		</div>
 	);
 }

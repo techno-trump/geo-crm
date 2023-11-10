@@ -14,6 +14,7 @@ import './i18n';
 import PresetsLoader from './components/PresetsLoader';
 import NewPoject from "./pages/NewProject";
 import NewBorehole from './pages/NewBorehole';
+import NewBox from './pages/NewBox';
 import EditBorehole from './pages/EditBorehole';
 import BoreholeForm from './components/BoreholeForm';
 import LoadingSplash from './components/LoadingSplash';
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
 				path: "boreholes/:boreholeId/column",
 					element: <GeologicalColumnPage />,
 			},
+			{
+        path: "boxes/new",
+        element: <NewBox />,
+      },
 			{
         path: "boxes/:boxId",
         element: <BoxSummaryPage />,

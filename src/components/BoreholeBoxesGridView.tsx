@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import shared from "../i18n/keys/shared";
 import { ActionsGroup, prepareActionsMeta } from "./Action";
-import { EditIcon, LayersIcon, RefreshIcon, RemoveIcon, ZoomInIcon } from "./icons";
+import { AddIcon, EditIcon, LayersIcon, RefreshIcon, RemoveIcon, ZoomInIcon } from "./icons";
 import { useMetaTranslate } from "../hooks";
 import clsx from "clsx";
 import { TBoxSchema } from "../types/boxes";
@@ -18,7 +18,7 @@ import {
 import boxes from '../i18n/keys/boxes';
 import ActionsPanel from './ActionsPanel';
 
-const rawActionsMeta: TRawActionsMeta<TListActionsContext & { recalculate: Function }> = [
+const rawActionsMeta: TRawActionsMeta<TListActionsContext & { recalculate: Function, boreholeId: number }> = [
 	{
 		caption: { ns: shared.__ns, key: shared.classify },
 		Icon: RefreshIcon,
@@ -42,6 +42,11 @@ const rawActionsMeta: TRawActionsMeta<TListActionsContext & { recalculate: Funct
 		tooltip: { ns: shared.__ns, key: shared.navigate_to_column },
 		Icon: LayersIcon,
 		onClickFactory: ({ navigate }) => () => { navigate("column") },
+	},
+	{
+		tooltip: { ns: boxes.__ns, key: boxes.add_box },
+		Icon: AddIcon,
+		onClickFactory: ({ navigate, boreholeId }) => () => { navigate("/boxes/new", { state: { boreholeId } }) },
 	},
 ];
 
@@ -141,7 +146,8 @@ const BoreholeBoxesGridView = ({ boreholeId }: IBoreholeBoxesGridViewprops) => {
 		selected: boxesData && boxesData.filter((_, idx) => selected[idx]) || [],
 		deleteRecords,
 		recalculate,
-		tMeta
+		tMeta,
+		boreholeId
 	});
 
 	useEffect(() => {

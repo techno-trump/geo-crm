@@ -1,4 +1,6 @@
 {
+	"new_box_creation": "Создание нового ящика",
+	"create_this_and_one_more": "Создать этот и еще один",
 	"edit_box_attributes": "Редактировать атрибуты ящика",
 	"edit_interval": "Редактировать интервал",
 	"edit_markup": "Редактировать разметку",

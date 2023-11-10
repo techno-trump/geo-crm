@@ -4,12 +4,14 @@ export type TBoxRawData = {
   "length": number;
   "image": TFileSchema;
   "borehole_id": number;
+	"status": string;
+	"scr": number;
+  "vein_material": number;
+	"number": number;
 }
 export type TBoxSchema = {
 	"id": number;
-	"scr": number;
-  "vein_material": number;
-	"status": string;
+	//"status": string;
 } & TBoxRawData;
 
 

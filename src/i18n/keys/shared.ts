@@ -1,5 +1,7 @@
 export default {
 	"__ns": "shared",
+	"basic_info": "basic_info",
+	"borehole_id": "borehole_id",
 	"add": "add",
 	"english": "english",
 	"russian": "russian",
