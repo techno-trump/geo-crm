@@ -232,7 +232,7 @@ const BoxSummary = ({ boxData }: IBoxSummaryProps) => {
 				<CellIntevals
 					key={idx}
 					boreholeName={boreholeQueryResult.data.name}
-					boxNumber={boxData.id}
+					boxNumber={boxData.number}
 					cellId={record.id}
 					cellNumber={idx + 1}
 				/>)}

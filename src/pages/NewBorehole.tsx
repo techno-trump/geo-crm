@@ -169,7 +169,7 @@ const NewBorehole = () => {
 				formData.images = imagesToLoad.filter(file => loadedImages.has(file)).map(file => loadedImages.get(file)!);
 				createBorehole(formData as TBoreholeRawData).unwrap()
 					.then(() => {
-						alert("Скважина была успешно создан");
+						alert("Скважина была успешно создана");
 					})
 					.catch(reason => {
 						alert("Ошибка при создании скважины: " + reason.message);

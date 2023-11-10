@@ -71,7 +71,7 @@ interface IMainTableRowProps {
 	selected: boolean;
 	toggleSelector: () => void;
 }
-const MainTableRow = ({ boxData, number, selected = false, toggleSelector }:IMainTableRowProps) => {
+const MainTableRow = ({ boxData, selected = false, toggleSelector }:IMainTableRowProps) => {
 	const { t: tBoxes } = useTranslation(boxes.__ns);
 	const navigate = useNavigate();
 
@@ -84,7 +84,7 @@ const MainTableRow = ({ boxData, number, selected = false, toggleSelector }:IMai
 						<span></span>
 					</label>
 				</td>
-				<td rowSpan={2}>{number}</td>
+				<td rowSpan={2}>{boxData.number}</td>
 				<td rowSpan={2}>
 					<div className="box_img">
 						<LoadableImage { ...boxData.image } />
@@ -117,13 +117,13 @@ interface IMinTableRowProps {
 	number: number;
 	boxData: TBoxSchema;
 }
-const MinTableRow = ({ boxData, number }: IMinTableRowProps) => {
+const MinTableRow = ({ boxData }: IMinTableRowProps) => {
 	const { t: tShared } = useTranslation(shared.__ns);
 
 	return (
 		<tr>
 			<td>{boxData.interval_from}-{boxData.interval_to}</td>
-			<td>{number}</td>
+			<td>{boxData.number}</td>
 			<td>{boxData.image.name}</td>
 			<td>{boxData.status === "success" ? tShared(shared.yes) : tShared(shared.no)}</td>
 		</tr>
@@ -176,7 +176,7 @@ const BoreholeBoxesGridView = ({ boreholeId }: IBoreholeBoxesGridViewprops) => {
 								<th>интервал <br/>(м)</th>
 								<th>длина <br/>(м)</th>
 								<th>SCR <br/>(%)</th>
-								<th>жильный <br/>метариал (%)</th>
+								<th>жильный <br/>материал (%)</th>
 							</tr>
 						</thead>
 						<tbody>
