@@ -48,21 +48,25 @@ const BoxMasks = ({ mainImg }:IBoxMasksProps) => {
 				<div className="case_img">
 					<LoadableImage {...mainImg} />
 				</div>
-				<div className={clsx("mask_img", activeMask === "veins" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="veins" />
+				<div className="masks">
+					<div className={clsx("mask_img", activeMask === "veins" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="veins" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "core" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="core" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "destroyed" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="destroyed" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "cracks" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="cracks" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "litotypes" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="litotypes" />
+					</div>
 				</div>
-				<div className={clsx("mask_img", activeMask === "core" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="core" />
-				</div>
-				<div className={clsx("mask_img", activeMask === "destroyed" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="destroyed" />
-				</div>
-				<div className={clsx("mask_img", activeMask === "cracks" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="cracks" />
-				</div>
-				<div className={clsx("mask_img", activeMask === "litotypes" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="litotypes" />
-				</div>
+				<input type="range" min="1" max="100" defaultValue="50" className="slider" name="slider" id="slider"/>
+    			<div className="slider-button"></div>
 			</div>
 			<ul className="case_buttons">
 				<li>
@@ -239,5 +243,6 @@ const BoxSummary = ({ boxData }: IBoxSummaryProps) => {
 		</>
 	);
 };
+document.querySelector('.case_images').addClass('mask-container');
 
 export default BoxSummary;
