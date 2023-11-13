@@ -243,6 +243,5 @@ const BoxSummary = ({ boxData }: IBoxSummaryProps) => {
 		</>
 	);
 };
-document.querySelector('.case_images').addClass('mask-container');
 
 export default BoxSummary;
