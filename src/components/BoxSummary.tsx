@@ -20,8 +20,12 @@ import { useGetByIdQuery } from "../services/boreholes";
 import LoadingContainer from "./LoadingContainer";
 import { TMaskType } from "./MarkupEditor";
 import clsx from "clsx";
-import { useState } from "react";
+import { CSSProperties, useRef, useState } from "react";
+import { useEffect } from "react";
 
+interface IMasksStyle extends CSSProperties {
+	'--container-width': string;
+  }
 
 interface IMaskImageProps {
 	mainImg: TFileSchema;
@@ -35,6 +39,10 @@ interface IBoxMasksProps {
 	mainImg: TFileSchema;
 }
 const BoxMasks = ({ mainImg }:IBoxMasksProps) => {
+	const containerRef = useRef<HTMLDivElement>(null);
+	const sliderRef = useRef<HTMLInputElement>(null);
+	const [containerWidth, setContainerWidth] = useState<string>("0px");
+	const [masksWidth, setMasksWidth] = useState<string>("50%");
 	const [activeMask, setActiveMask] = useState<TMaskType | null>(null);
 	const { t: tShared } = useTranslation(shared.__ns);
 	const getToggleHandler = (maskType: TMaskType) => {
@@ -42,27 +50,59 @@ const BoxMasks = ({ mainImg }:IBoxMasksProps) => {
 			setActiveMask(current => current === maskType ? null : maskType);
 		}
 	}
+	const updateWidthBySliderValue = () => {
+		if (!sliderRef.current) return;
+		const sliderValue = Number(sliderRef.current.value);
+		const sliderPos = sliderValue - (1 - (0.01 * sliderValue));
+		// Update the width of the foreground image
+		setMasksWidth(`${sliderPos}%`);
+	}
+	const slideHandler = () => {
+		updateWidthBySliderValue();
+	}
+
+	useEffect(() => {
+		if (!containerRef.current) return;
+		const updateWidth = (elem: HTMLDivElement) => {
+			const containerWidth = elem.offsetWidth;
+			setContainerWidth(`${containerWidth}px`);
+			updateWidthBySliderValue();
+		}
+		const resizeObserver = new ResizeObserver((entries) => {
+			entries.forEach(({ target }) => target === containerRef.current && updateWidth(target as HTMLDivElement));
+		});
+		resizeObserver.observe(containerRef.current);
+		updateWidth(containerRef.current);
+
+		return () => {
+			resizeObserver.disconnect();
+		};
+	  }, []);
 	return (
 		<section className="case_net __flex">
-			<div className="case_images">
+			<div ref={containerRef} className="case_images mask-container">
 				<div className="case_img">
 					<LoadableImage {...mainImg} />
 				</div>
-				<div className={clsx("mask_img", activeMask === "veins" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="veins" />
+				<div className="masks" style={{ width: masksWidth, "--container-width": containerWidth } as IMasksStyle}>
+					<div className={clsx("mask_img", activeMask === "veins" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="veins" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "core" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="core" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "destroyed" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="destroyed" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "cracks" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="cracks" />
+					</div>
+					<div className={clsx("mask_img", activeMask === "litotypes" && "active")}>
+						<MaskImage mainImg={mainImg} maskType="litotypes" />
+					</div>
 				</div>
-				<div className={clsx("mask_img", activeMask === "core" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="core" />
-				</div>
-				<div className={clsx("mask_img", activeMask === "destroyed" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="destroyed" />
-				</div>
-				<div className={clsx("mask_img", activeMask === "cracks" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="cracks" />
-				</div>
-				<div className={clsx("mask_img", activeMask === "litotypes" && "active")}>
-					<MaskImage mainImg={mainImg} maskType="litotypes" />
-				</div>
+				<input ref={sliderRef} onInput={slideHandler} type="range" min="1" max="100" defaultValue="50" className="slider" name="slider" id="slider"/>
+    			<div className="slider-button" style={{left:`calc(${masksWidth} - 15px)`}}></div>
 			</div>
 			<ul className="case_buttons">
 				<li>

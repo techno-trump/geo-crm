@@ -1,5 +1,5 @@
 import { TBoxSchema } from "../../types/boxes";
-import { EditIcon, EllipseIcon, EraserIcon, PolygonIcon, PolylineIcon, RectangleIcon, RefreshIcon, SaveIcon, UndoIcon } from "../icons";
+import { EditIcon, EllipseIcon, EraserIcon, PolygonIcon, PolylineIcon, RectangleIcon, RefreshIcon, SaveIcon, UndoIcon, ZoomInIcon } from "../icons";
 import shared from "../../i18n/keys/shared";
 import { useMetaTranslate } from "../../hooks";
 import { useTranslation } from "react-i18next";
@@ -10,8 +10,7 @@ import EditorView, { TEditorContext } from "./EditorView";
 import clsx from "clsx";
 import { useUpdateMaskMutation } from "../../services/images";
 import LoadingContainer from "../LoadingContainer";
-
-export type TToolAlias = "polygon" | "pencil" | "line" | "rectangle" | "circle" | "eraser";
+export type TToolAlias = "polygon" | "pencil" | "line" | "rectangle" | "circle" | "eraser" | "zoom";
 type TToolOptionRawMeta = {
 	Icon: TIcon;
 	name: TTranslationKey;
@@ -24,8 +23,28 @@ const toolsRawMeta: TToolOptionRawMeta[] = [
 	{ alias: "rectangle", name: { ns: shared.__ns, key: shared.rectangle }, Icon: RectangleIcon },
 	{ alias: "circle", name: { ns: shared.__ns, key: shared.ellipse }, Icon: EllipseIcon },
 	{ alias: "eraser", name: { ns: shared.__ns, key: shared.eraser }, Icon: EraserIcon },
+	{ alias: "zoom", name: { ns: shared.__ns, key: shared.zoom }, Icon: ZoomInIcon },
+
 	// Tools.Arrow,
 ];
+
+interface IToolSizeSelectorProps {
+	activeTool: TToolAlias;
+	toolSize: number;
+	setToolSize: Dispatch<SetStateAction<number>>;
+}
+const ToolSizeSelector = ({ toolSize, setToolSize }: IToolSizeSelectorProps) => {
+	const { t: tShared } = useTranslation(shared.__ns); 
+	return 	<div className="markup-editor__tool-size-selector">
+						<div className="me-tool-size-selector" data-legend={tShared(shared.tool_size)}>
+							<input
+								type="range" value={toolSize}
+								onInput={({ target }) => setToolSize(Number((target as HTMLInputElement).value))}
+								min={1} max={64} step={1}
+							/>
+						</div>
+					</div>
+}
 interface IToolSelectProps {
 	activeTool: TToolAlias;
 	setActiveTool: Dispatch<SetStateAction<TToolAlias>>;
@@ -37,7 +56,7 @@ const ToolSelect = ({ activeTool, setActiveTool }: IToolSelectProps) => {
 		<div className="markup-editor__tools">
 			{
 				toolsMeta.map(({ alias, name, Icon }) => {
-					return <button type="button" onClick={() => setActiveTool(alias)} className={clsx("__btn _icon ", activeTool === alias && "active")} data-legend={tMeta(name)}>
+					return <button key={alias} type="button" onClick={() => setActiveTool(alias)} className={clsx("__btn _icon ", activeTool === alias && "active")} data-legend={tMeta(name)}>
 										<Icon />
 									</button>;
 				})
@@ -145,8 +164,10 @@ interface IActionsPanelProps {
 	undo: () => void;
 	clear: () => void;
 	save: () => Promise<unknown>;
+	toolSize: number;
+	setToolSize: Dispatch<SetStateAction<number>>;
 }
-const ActionsPanel = ({ activeTool, setActiveTool, undo, clear, save }:IActionsPanelProps) => {
+const ActionsPanel = ({ activeTool, setActiveTool, toolSize, setToolSize, undo, clear, save }:IActionsPanelProps) => {
 	const [saving, setSaving] = useState<boolean>(false);
 	const handleSave = () => {
 		setSaving(true);
@@ -166,6 +187,7 @@ const ActionsPanel = ({ activeTool, setActiveTool, undo, clear, save }:IActionsP
 				<SaveIcon />
 				{saving && <LoadingContainer absolute={true} />}
 			</button>
+			<ToolSizeSelector activeTool={activeTool} toolSize={toolSize} setToolSize={setToolSize} />
 		</section>
 	);
 }
@@ -176,6 +198,7 @@ const MarkupEditor = ({ boxData }: IMarkupEditorProps) => {
 	const ctxRef = useRef<TEditorContext | null>(null);
 	const [_, setErrorState] = useState<{ msg: string, timer: number } | null>(null);
 	const [showOriginal, setShowOriginal] = useState<boolean>(false);
+	const [toolSize, setToolSize] = useState<number>(4);
 	const [activeTool, setActiveTool] = useState<TToolAlias>("pencil");
 	const [activeLayer, setActiveLayer] = useState<TMaskType | null>(null);
 	const [layersToShow, setLayersToShow] = useState<Set<TMaskType>>(new Set(layersToShowMeta.map(({ alias }) => alias)));
@@ -240,12 +263,13 @@ const MarkupEditor = ({ boxData }: IMarkupEditorProps) => {
 
 	return (
 		<div className="training wrapper markup-editor">
-			<ActionsPanel activeTool={activeTool} setActiveTool={setActiveTool} undo={undo} clear={clear} save={save} />
+			<ActionsPanel activeTool={activeTool} setActiveTool={setActiveTool} toolSize={toolSize} setToolSize={setToolSize} undo={undo} clear={clear} save={save} />
 			<section className="training_net __flex">
 				<EditorView
 					boxData={boxData}
 					showOriginal={showOriginal}
 					activeTool={activeTool}
+					toolSize={toolSize}
 					activeLayerMeta={layersToDrawMeta.find(item => item.alias === activeLayer)}
 					layersToShow={layersToShow}
 					getContext={getContext}
