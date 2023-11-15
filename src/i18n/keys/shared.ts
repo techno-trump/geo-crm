@@ -41,6 +41,7 @@ export default {
 	"circle": "circle",
 	"ellipse": "ellipse",
 	"polygon": "polygon",
+	"zoom": "zoom",
 	"pan": "pan",
 	"tools": "tools",
 	"show_original": "show_original",

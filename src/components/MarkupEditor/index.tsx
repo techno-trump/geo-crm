@@ -1,5 +1,5 @@
 import { TBoxSchema } from "../../types/boxes";
-import { EditIcon, EllipseIcon, EraserIcon, PolygonIcon, PolylineIcon, RectangleIcon, RefreshIcon, SaveIcon, UndoIcon } from "../icons";
+import { EditIcon, EllipseIcon, EraserIcon, PolygonIcon, PolylineIcon, RectangleIcon, RefreshIcon, SaveIcon, UndoIcon, ZoomInIcon } from "../icons";
 import shared from "../../i18n/keys/shared";
 import { useMetaTranslate } from "../../hooks";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ import clsx from "clsx";
 import { useUpdateMaskMutation } from "../../services/images";
 import LoadingContainer from "../LoadingContainer";
 
-export type TToolAlias = "polygon" | "pencil" | "line" | "rectangle" | "circle" | "eraser";
+export type TToolAlias = "polygon" | "pencil" | "line" | "rectangle" | "circle" | "eraser" | "zoom";
 type TToolOptionRawMeta = {
 	Icon: TIcon;
 	name: TTranslationKey;
@@ -24,6 +24,8 @@ const toolsRawMeta: TToolOptionRawMeta[] = [
 	{ alias: "rectangle", name: { ns: shared.__ns, key: shared.rectangle }, Icon: RectangleIcon },
 	{ alias: "circle", name: { ns: shared.__ns, key: shared.ellipse }, Icon: EllipseIcon },
 	{ alias: "eraser", name: { ns: shared.__ns, key: shared.eraser }, Icon: EraserIcon },
+	{ alias: "zoom", name: { ns: shared.__ns, key: shared.zoom }, Icon: ZoomInIcon },
+
 	// Tools.Arrow,
 ];
 interface IToolSelectProps {

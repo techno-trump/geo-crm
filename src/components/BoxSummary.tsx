@@ -21,7 +21,7 @@ import LoadingContainer from "./LoadingContainer";
 import { TMaskType } from "./MarkupEditor";
 import clsx from "clsx";
 import { useState } from "react";
-
+import { useEffect } from "react";
 
 interface IMaskImageProps {
 	mainImg: TFileSchema;
@@ -42,9 +42,40 @@ const BoxMasks = ({ mainImg }:IBoxMasksProps) => {
 			setActiveMask(current => current === maskType ? null : maskType);
 		}
 	}
+	useEffect(() => {
+		const maskImages = document.querySelectorAll(
+		  ".mask_img"
+		) as NodeListOf<HTMLElement>;
+	
+		const maskContainerWidth = (
+		  document.querySelector(".mask-container") as HTMLElement
+		).offsetWidth;
+	
+		maskImages.forEach((img) => {
+		  img.style.width = maskContainerWidth + "px";
+		});
+	
+		document.getElementById("slider")!.addEventListener("input", (e) => {
+		  const sliderPos = (e.target as HTMLInputElement).value - (1 - (0.01 * (e.target as HTMLInputElement).value));
+			console.log((e.target as HTMLInputElement).value + '---' + sliderPos);
+		  // Update the width of the foreground image
+		  (
+			document.querySelector(".masks") as HTMLElement
+		  ).style.width = `${sliderPos}%`;
+	
+		  // Update the position of the slider button
+		  (
+			document.querySelector(".slider-button") as HTMLElement
+		  ).style.left = `calc(${sliderPos}% - 15px)`;
+		});
+	
+		// document.getElementById("slider")!.addEventListener("change", (e) => {
+		//   // Additional logic to handle the 'change' event if needed
+		// });
+	  }, []);
 	return (
 		<section className="case_net __flex">
-			<div className="case_images">
+			<div className="case_images mask-container">
 				<div className="case_img">
 					<LoadableImage {...mainImg} />
 				</div>
