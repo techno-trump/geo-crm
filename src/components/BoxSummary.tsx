@@ -56,8 +56,8 @@ const BoxMasks = ({ mainImg }:IBoxMasksProps) => {
 		});
 	
 		document.getElementById("slider")!.addEventListener("input", (e) => {
-		  const sliderPos = (e.target as HTMLInputElement).value - (1 - (0.01 * (e.target as HTMLInputElement).value));
-			console.log((e.target as HTMLInputElement).value + '---' + sliderPos);
+			const sliderPosNumber = Number((e.target as HTMLInputElement).value);
+			const sliderPos = sliderPosNumber - (1 - (0.01 * sliderPosNumber));
 		  // Update the width of the foreground image
 		  (
 			document.querySelector(".masks") as HTMLElement
