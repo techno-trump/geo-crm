@@ -23,6 +23,9 @@ export const options: ChartOptions<"bar"> = {
 			reverse: true,
 		},
 		y: {
+			grid: {
+				display: false,
+			},
 			reverse: false,
 		}
 	},
